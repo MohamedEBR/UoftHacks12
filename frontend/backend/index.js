@@ -24,9 +24,10 @@ connectDB();
 
 const app = express();
 
+
 app.use(cors({
-  origin: "*",
-  methods: "GET,PUT,POST,DELETE",
+  origin: "*", // #TODO: https://domain/
+  methods: "GET,PUT,POST,DELETE", 
   credentials: true,
 }));
 

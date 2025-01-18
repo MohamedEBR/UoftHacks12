@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-img_path = "./test_images/comparison.jpeg"
+img_path = "./test_images/c6.jpeg"
 original_img = plt.imread(img_path)
 
 cat_matrix = np.array([

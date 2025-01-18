@@ -2,9 +2,6 @@ pillow.py
 *.jpg
 *.jpeg
 env/
-<<<<<<< HEAD
 .DS_Store
-=======
 __pycache__/
 
->>>>>>> e90f8b4 (reorganized structure, abandoned ml idea)

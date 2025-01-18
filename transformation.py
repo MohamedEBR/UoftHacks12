@@ -1,7 +1,6 @@
 import numpy as np
 from PIL import Image
 from moviepy.editor import VideoFileClip
-from scipy.ndimage import gaussian_filter
 
 # cat transformation matrix
 CAT_TRANSFORMATION_MATRIX = np.array([
@@ -137,7 +136,7 @@ def warp_fisheye_flat(pixels, h, w, distortion_strength=0.3):
                 i_out = new_yi * w + new_xi
                 out[i_out] = pixels[i_in]
 
-    return out
+#     return out
 
 def dog_vision_array_transform(frame):
     """

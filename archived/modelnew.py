@@ -1,5 +1,4 @@
 import torch
-import timm
 
 model_path = "./egopet_model.pth"
 

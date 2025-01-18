@@ -1,16 +1,13 @@
 import numpy as np
 from PIL import Image
-<<<<<<< HEAD
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 from scipy.ndimage import gaussian_filter
-=======
 from moviepy import VideoFileClip
 
-from flask import Flask
+from flask import Flask, send_file, jsonify, request
 
 app = Flask(__name__)
 
->>>>>>> 270fa5c (adding flask)
 
 # cat transformation matrix
 CAT_TRANSFORMATION_MATRIX = np.array([
@@ -185,6 +182,28 @@ def dog_vision_array_transform(frame):
 
 
 
+def cat_vision_array_transform(frame):
+
+    frame_float = frame.astype(np.float32) / 255.0
+
+    h, w, c = frame_float.shape
+    pixels = frame_float.reshape(-1, c)
+
+    transformed = colour_change(pixels, CAT_TRANSFORMATION_MATRIX)
+    transformed = luminance(10, 0.1, transformed)
+
+    transformed = transformed.reshape(h, w, c)  # Reshape back to H x W x C for spatial operations
+    for channel in range(3):  # Apply blur channel-wise
+        transformed[..., channel] = gaussian_filter(transformed[..., channel], sigma=1)
+
+    # get back to output format
+    transformed = transformed.reshape(h, w, c)
+    transformed = np.clip(transformed, 0, 1)
+    transformed_uint8 = (transformed * 255).astype(np.uint8)
+
+    return transformed_uint8
+
+
 def simulate_dog_vision_video(input_video_path, output_video_path):
     """
     Reads a video, applies the dog-vision color transform to each frame,
@@ -201,11 +220,54 @@ def simulate_dog_vision_video(input_video_path, output_video_path):
     
     # Note: you can specify fps=..., audio=..., preset=... etc. in write_videofile()
 
-<<<<<<< HEAD
-simulate_dog_vision_video("testvid.mp4", "outputvid.mp4")
-=======
 # simulate_dog_vision_video("testvid.mp4", "outputvid.mp4")
 
 
-def simulate
->>>>>>> 270fa5c (adding flask)
+def simulate_cat_vision_video(input_video_path, output_video_path):
+    """
+    Reads a video, applies the cat-vision color transform to each frame,
+    and writes out a new video.
+    """
+    # Load the video
+    clip = VideoFileClip(input_video_path)
+    
+    # Apply frame-by-frame transform using fl_image
+    cat_vision_clip = clip.fl_image(cat_vision_array_transform)
+    
+    # Write the transformed clip to a file
+    cat_vision_clip.write_videofile(output_video_path, codec="libx264")
+    
+    # Note: you can specify fps=..., audio=..., preset=... etc. in write_videofile()
+
+
+
+
+@app.route('/animals')
+def animals():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    
+    animal_type = request.get_json("animal_type")
+    
+    # Save the uploaded video file
+    input_video_path = "input_video.mp4"
+    file.save(input_video_path)
+    
+    # Define the output video path
+    output_video_path = "output_video.mp4"
+    
+    # Process the video
+    if (animal_type == "cat"):
+        simulate_cat_vision_video(input_video_path, output_video_path)
+    elif (animal_type == "dog"):
+        simulate_dog_vision_video(input_video_path, output_video_path)
+    
+    # Return the processed video file
+    return send_file(output_video_path, mimetype='video/mp4')
+
+

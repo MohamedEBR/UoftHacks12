@@ -10,6 +10,6 @@ torchvision
 timm
 flask
 moviepy
-
+scipy
 
 

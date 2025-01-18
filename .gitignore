@@ -2,4 +2,4 @@ pillow.py
 *.jpg
 *.jpeg
 env/
-
+.DS_Store

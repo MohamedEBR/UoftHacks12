@@ -1,69 +1,37 @@
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import { useState } from 'react';
-import placeholderImage from './assets/placeholder.jpg';
+import { useContext } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+import Header from './components/Header';
+import PostList from './components/PostList';
+import PostDetails from './components/PostDetails';
+import PostForm from './components/PostForm';
+import UserProfile from './components/UserProfile';
+import PrivateRoute from './components/PrivateRoute';
+import { AuthContext } from './context/AuthContext';
+import { PostProvider } from './context/PostContext';
+import { Container } from 'react-bootstrap';
 
 function App() {
-
-
-  const [image, setImage] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const handleImageChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      setImage(URL.createObjectURL(event.target.files[0]));
-      setSelectedFile(event.target.files[0]);
-    }
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert("Please select a file.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
-    try {
-      const response = await fetch('http://localhost:5000/upload', { // Backend runs on port 5000
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        alert("File uploaded successfully!");
-      } else {
-        alert("File upload failed.");
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("Error uploading file.");
-    }
-  };
+  const { isLoggedIn } = useContext(AuthContext);
 
   return (
-    <Container className="text-center mt-5 d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-      <div>
-        <h1>My Title</h1>
-        <p style={{ marginTop: '100px' }}>This is the description.</p>
-        <div style={{ height: '300px', width: '300px', overflow: 'hidden', margin: '0 auto' }}>
-          
-          {/* #TODO: After upload, updated Image needs to be displayed */}
-          {image ? (
-            <img src={image} alt="Selected" style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }} />
-          ) : (
-            <img src={placeholderImage} alt="Placeholder" style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }} />
-          )}
-        </div>
-        <Form.Group controlId="formFile" className="mb-3">
-          <Form.Label>Images and Videos</Form.Label>
-          <Form.Control type="file" accept="image/*,video/*" onChange={handleImageChange} />
-        </Form.Group>
-        <Button variant="primary" onClick={handleUpload}>Upload</Button>
-      </div>
-    </Container>
+    <Router>
+      <Header className="bg-light" />
+      <Container>
+        <PostProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={isLoggedIn ? <Navigate to="/feed" /> : <Navigate to="/login" />} />
+            <Route path="/feed" element={<PrivateRoute><PostList /></PrivateRoute>} />
+            <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+            <Route path="/post/:id" element={<PrivateRoute><PostDetails /></PrivateRoute>} />
+            <Route path="/create-post" element={<PrivateRoute><PostForm /></PrivateRoute>} />
+          </Routes>
+        </PostProvider>
+      </Container>
+    </Router>
   );
 }
 

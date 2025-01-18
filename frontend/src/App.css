@@ -40,3 +40,16 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Consistent styling for form inputs */
+.form-control {
+  border-color: #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: 0;
+}

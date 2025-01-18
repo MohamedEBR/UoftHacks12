@@ -1,7 +1,16 @@
 import numpy as np
 from PIL import Image
+<<<<<<< HEAD
 from moviepy.editor import VideoFileClip
 from scipy.ndimage import gaussian_filter
+=======
+from moviepy import VideoFileClip
+
+from flask import Flask
+
+app = Flask(__name__)
+
+>>>>>>> 270fa5c (adding flask)
 
 # cat transformation matrix
 CAT_TRANSFORMATION_MATRIX = np.array([
@@ -175,6 +184,7 @@ def dog_vision_array_transform(frame):
     return transformed_uint8
 
 
+
 def simulate_dog_vision_video(input_video_path, output_video_path):
     """
     Reads a video, applies the dog-vision color transform to each frame,
@@ -191,4 +201,11 @@ def simulate_dog_vision_video(input_video_path, output_video_path):
     
     # Note: you can specify fps=..., audio=..., preset=... etc. in write_videofile()
 
+<<<<<<< HEAD
 simulate_dog_vision_video("testvid.mp4", "outputvid.mp4")
+=======
+# simulate_dog_vision_video("testvid.mp4", "outputvid.mp4")
+
+
+def simulate
+>>>>>>> 270fa5c (adding flask)

@@ -80,7 +80,7 @@ const PostCard = ({ post }) => {
   return (
     <Card className="mb-3 shadow-sm">
       <Card.Body>
-        <UserProfileCard user={post.author} />
+        {post.user.username && <UserProfileCard user={post.author} />}
         <Card.Text className="mt-2">{post.content}</Card.Text>
         {post.image && (
           <Image src={`http://localhost:5000/${post.image}`} fluid rounded className="mb-2" />

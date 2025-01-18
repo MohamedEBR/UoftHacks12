@@ -5,6 +5,7 @@ import auth from '../middleware/auth.js';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 import multer from 'multer';
+
 const upload = multer({
   storage: multer.diskStorage({
     destination(req, file, cb) {
@@ -25,42 +26,43 @@ const upload = multer({
         )
       );
     }
-    cb(undefined, true); // continue with upload
+    cb(undefined, true);
   }
 });
-
 
 // @route   POST api/posts
 // @desc    Create a post
 // @access  Private
-/* POST post */
-router.post(
-  '/',
-  upload.single('file'),
-  async (req, res) => {
-    try {
-      const { title, date, content } = req.body;
-      const { path, mimetype } = req.file;
-      const blog = new Blog({
-        title,
-        date,
-        content,
-        file_path: path,
-        file_mimetype: mimetype
-      });
-      await blog.save();
-      res.send('file uploaded successfully.');
-    } catch (error) {
-      
-      res.status(400).send(`Error while uploading file. Try again later. ${error}`);
-    }
-  },
-  (error, req, res, next) => {
-    if (error) {
-      res.status(500).send(error.message);
-    }
+router.post('/', auth, upload.single('file_path'), async (req, res) => {
+  const { title, content, tags } = req.body;
+  const file_path = req.file;
+
+  if (!req.user) {
+    return res.status(401).json({ msg: 'Unauthorized' });
   }
-);
+
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+
+    const newPost = new Post({
+      title,
+      content,
+      tags,
+      file_path: file_path ? file_path.path : null,
+      user: req.user.id,
+      name: user.username,
+      avatar: user.avatar,
+      file_mimetype: file_path ? file_path.mimetype : null,
+    });
+
+    const post = await newPost.save();
+    console.log('Post created:', post);
+    res.json(post);
+  } catch (err) {
+    console.error('Error creating post:', err.message);
+    res.status(500).send('Server Error');
+  }
+});
 
 // @route   GET api/posts
 // @desc    Get all posts
@@ -151,9 +153,15 @@ router.put('/like/:id', auth, async (req, res) => {
 // @desc    Update a post
 // @access  Private
 router.put('/:id', [auth, [
-  check('text', 'Text is required').not().isEmpty()
+  check('text', 'Text is required').not().isEmpty(),
+  check('imageUrl', 'Image URL is required').not().isEmpty(),
+  check('tags', 'Tags are required').not().isEmpty()
 ]], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const post = await Post.findById(req.params.id);
 
     if (!post) {
@@ -165,9 +173,11 @@ router.put('/:id', [auth, [
       return res.status(401).json({ msg: 'User not authorized' });
     }
 
-    post.text = req.body.text;
-    post.imageUrl = req.body.imageUrl;
-    post.tags = req.body.tags;
+    const { text, imageUrl, tags } = req.body;
+
+    post.text = text;
+    post.imageUrl = imageUrl;
+    post.tags = tags;
     post.updatedAt = Date.now();
 
     await post.save();
@@ -239,6 +249,7 @@ router.post('/comment/:id', [auth, [
     res.json(post.comments);
   } catch (err) {
     console.error(err.message);
+    res.status(500).send('Server Error');
     res.status(500).send('Server Error');
   }
 });

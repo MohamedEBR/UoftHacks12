@@ -1,7 +1,13 @@
 import numpy as np
 from PIL import Image
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 from scipy.ndimage import gaussian_filter
+from moviepy import VideoFileClip
+
+from flask import Flask, send_file, jsonify, request
+
+app = Flask(__name__)
+
 
 # cat transformation matrix
 CAT_TRANSFORMATION_MATRIX = np.array([
@@ -187,6 +193,29 @@ def cat_vision_array_transform(frame):
     
     # # Apply fisheye warp
     # transformed = fisheye_warp(transformed, h, w, strength=1.5)
+
+    # get back to output format
+    transformed = transformed.reshape(h, w, c)
+    transformed = np.clip(transformed, 0, 1)
+    transformed_uint8 = (transformed * 255).astype(np.uint8)
+
+    return transformed_uint8
+
+
+
+def cat_vision_array_transform(frame):
+
+    frame_float = frame.astype(np.float32) / 255.0
+
+    h, w, c = frame_float.shape
+    pixels = frame_float.reshape(-1, c)
+
+    transformed = colour_change(pixels, CAT_TRANSFORMATION_MATRIX)
+    transformed = luminance(10, 0.1, transformed)
+
+    transformed = transformed.reshape(h, w, c)  # Reshape back to H x W x C for spatial operations
+    for channel in range(3):  # Apply blur channel-wise
+        transformed[..., channel] = gaussian_filter(transformed[..., channel], sigma=1)
 
     # get back to output format
     transformed = transformed.reshape(h, w, c)

@@ -1,6 +1,7 @@
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
+import placeholderImage from './assets/placeholder.jpg';
 
 function App() {
   const [image, setImage] = useState(null);
@@ -16,7 +17,13 @@ function App() {
       <div>
         <h1>My Title</h1>
         <p style={{ marginTop: '100px' }}>This is the description.</p>
-        {image && <img src={image} alt="Selected" style={{ maxWidth: '300px', maxHeight: '300px' }} />}
+        <div style={{ height: '300px', width: '300px', overflow: 'hidden', margin: '0 auto' }}>
+          {image ? (
+            <img src={image} alt="Selected" style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }} />
+          ) : (
+            <img src={placeholderImage} alt="Placeholder" style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }} />
+          )}
+        </div>
         <Form.Group controlId="formFile" className="mb-3">
           <Form.Label>Images and Videos</Form.Label>
           <Form.Control type="file" accept="image/*,video/*" onChange={handleImageChange} />

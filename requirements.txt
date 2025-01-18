@@ -8,5 +8,8 @@ datasets
 torch
 torchvision
 timm
+flask
+moviepy
+
 
 

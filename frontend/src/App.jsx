@@ -1,35 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import { useState } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [image, setImage] = useState(null);
+
+  const handleImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      setImage(URL.createObjectURL(event.target.files[0]));
+    }
+  };
 
   return (
-    <>
+    <Container className="text-center mt-5 d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h1>My Title</h1>
+        <p style={{ marginTop: '100px' }}>This is the description.</p>
+        {image && <img src={image} alt="Selected" style={{ maxWidth: '300px', maxHeight: '300px' }} />}
+        <Form.Group controlId="formFile" className="mb-3">
+          <Form.Label>Images and Videos</Form.Label>
+          <Form.Control type="file" accept="image/*,video/*" onChange={handleImageChange} />
+        </Form.Group>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Container>
+  );
 }
 
-export default App
+export default App;

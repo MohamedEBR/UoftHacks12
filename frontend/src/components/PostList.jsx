@@ -54,14 +54,15 @@ const PostList = () => {
       </Container>
     );
   }
-
+  console.log(posts)
   return (
     <Container className="mt-5">
       <h2>Feed</h2>
       <Row xs={1} md={2} lg={3} className="g-4">
+
         {posts.map(post => (
           <Col key={post._id}>
-            <PostCard post={post} />
+            <PostCard post={post} author={post.user} />
           </Col>
         ))}
       </Row>

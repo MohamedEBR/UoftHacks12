@@ -1,25 +1,24 @@
 import PropTypes from 'prop-types';
-import { Card, Image } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 
 const UserProfileCard = ({ user }) => {
-  if (!user) {
-    return <div>Loading user information...</div>;
-  }
-
   return (
-    <Card className="shadow-sm">
+    <Card className="mb-2">
       <Card.Body className="d-flex align-items-center">
-        <Image
-          src={user.avatar || 'https://via.placeholder.com/150'}
-          alt="User Avatar"
-          roundedCircle
-          width={50}
-          height={50}
-          className="me-3"
-        />
+        {user && user.avatar && (
+          <img
+            src={`http://localhost:5000/${user.avatar}`}
+            alt="User Avatar"
+            className="rounded-circle me-2"
+            width="30"
+            height="30"
+          />
+        )}
         <div>
-          <Card.Title className="mb-1">{user.username}</Card.Title>
-          <Card.Subtitle className="text-muted">{user.bio}</Card.Subtitle>
+          <Card.Title className="mb-0">
+            {user ? user.username : 'Unknown User'}
+          </Card.Title>
+          {user && user.bio && <Card.Subtitle className="text-muted">{user.bio}</Card.Subtitle>}
         </div>
       </Card.Body>
     </Card>
@@ -29,9 +28,9 @@ const UserProfileCard = ({ user }) => {
 UserProfileCard.propTypes = {
   user: PropTypes.shape({
     avatar: PropTypes.string,
-    username: PropTypes.string.isRequired,
+    username: PropTypes.string,
     bio: PropTypes.string,
-  }).isRequired,
+  }),
 };
 
 export default UserProfileCard;

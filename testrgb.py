@@ -8,8 +8,6 @@ img_path = "./test_images/comparison.jpeg"
 original_img = plt.imread(img_path)
 
 
-
-
 cat_matrix = np.array([
     [0.2, 0.5, 0.3],
     [0.2, 0.7, 0.1],
@@ -21,8 +19,6 @@ cat_matrix = np.array([
 #     [0.4, 0.5, 0.1],  # Balance green with red, slightly less blue
 #     [0.2, 0.3, 0.5]   # Reduce blue's self-influence, add green
 # ])
-
-
 
 
 

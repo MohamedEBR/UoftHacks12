@@ -19,7 +19,7 @@ DOG_TRANSFORMATION_MATRIX = np.array([
 # s = c log (1 + ar)
 # c is an overall scaling factor
 # a is a secondary scale on the original intensity
-# log (1 + ar) to avoid log(0)
+# log (1 + ar) to avoid log(0)x`x```
 def luminance(c, a, r):
     return c * np.log(1 + a * r)
 

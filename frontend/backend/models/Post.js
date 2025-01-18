@@ -12,11 +12,11 @@ const PostSchema = new Schema({
   },
   file_path : {
     type: String,
-  required: true
+  required: false
 },
 file_mimetype: {
     type: String,
-    required: true
+    required: false
   },
   likes: [{
     user: {

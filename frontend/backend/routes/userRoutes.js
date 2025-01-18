@@ -1,123 +1,257 @@
-import express, { json } from 'express';
+import express from 'express';
 const router = express.Router();
+import { check, validationResult } from 'express-validator';
 import auth from '../middleware/auth.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import Post from '../models/Post.js';
 import User from '../models/User.js';
-const { JsonWebTokenError } = jwt;
+import multer from 'multer';
 
-// @route   POST api/users/register
-// @desc    Register a new user
-// @access  Public
-router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
-
-  try {
-    // Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, cb) {
+      cb(null, './files');
+    },
+    filename(req, file, cb) {
+      cb(null, `${new Date().getTime()}_${file.originalname}`);
     }
-
-    user = new User({
-      username,
-      email,
-      password
-    });
-
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    await user.save();
-
-    // Return JWT
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) {
-          throw err;
-        }
-        User.findById(payload.user.id)
-          .select('-password')
-          .then(user => {
-            res.json({ token, user });
-          });
-      }
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+  }),
+  limits: {
+    fileSize: 100000000000 // max file size 1MB = 1000000 bytes
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpeg|jpg|JPG|png|pdf|doc|docx|xlsx|xls|mp4|avi|mkv|mov)$/)) {
+      return cb(
+        new Error(
+          'only upload files with jpg, jpeg, png, pdf, doc, docx, xslx, xls format.'
+        )
+      );
+    }
+    cb(undefined, true);
   }
 });
 
-// @route   POST api/users/login
-// @desc    Login user / Authenticate user
-// @access  Public
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // See if user exists
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ errors: [ { msg: 'Invalid Credentials' }] });
-    }
-
-    // Match password
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ errors: [ { msg: 'Invalid Credentials' }] });
-    }
-
-    // Return JWT
-    const payload = {
-      user: {
-        id: user.id
-      }
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) {
-          throw err;
-        }
-        User.findById(payload.user.id)
-          .select('-password')
-          .then(user => {
-            res.json({ token, user });
-          });
-      }
-    );
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-});
-
-// @route   GET api/users/me
-// @desc    Get current user
+// @route   POST api/posts
+// @desc    Create a post
 // @access  Private
-router.get('/profile', auth, async (req, res) => {
+router.post('/', auth, upload.single('file_path'), async (req, res) => {
+  const { title, content, tags } = req.body;
+  const file_path = req.file;
+
+  if (!req.user) {
+    return res.status(401).json({ msg: 'Unauthorized' });
+  }
+
   try {
     const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
+
+    const newPost = new Post({
+      title,
+      content,
+      tags,
+      file_path: file_path ? file_path.path : null,
+      user: req.user.id,
+      name: user.username,
+      avatar: user.avatar,
+      file_mimetype: file_path ? file_path.mimetype : null,
+    });
+
+    const post = await newPost.save();
+    console.log('Post created:', post);
+    res.json(post);
+  } catch (err) {
+    console.error('Error creating post:', err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   GET api/posts
+// @desc    Get all posts
+// @access  Public
+router.get('/', async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ date: -1 });
+    res.json(posts);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 });
 
-export default router
+// @route   GET api/posts/:id
+// @desc    Get post by ID
+// @access  Public
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+
+    res.json(post);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   DELETE api/posts/:id
+// @desc    Delete a post
+// @access  Private
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+
+    // Check user
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    await post.remove();
+
+    res.json({ msg: 'Post removed' });
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route    PUT api/posts/like/:id
+// @desc     Like a post
+// @access   Private
+router.put('/like/:id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    // Check if the post has already been liked
+    if (post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+      return res.status(400).json({ msg: 'Post already liked' });
+    }
+
+    post.likes.unshift({ user: req.user.id });
+
+    await post.save();
+
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   PUT api/posts/:id
+// @desc    Update a post
+// @access  Private
+router.put('/:id', [auth, [
+  check('text', 'Text is required').not().isEmpty(),
+  check('imageUrl', 'Image URL is required').not().isEmpty(),
+  check('tags', 'Tags are required').not().isEmpty()
+]], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+
+    // Check user
+    if (post.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized' });
+    }
+
+    const { text, imageUrl, tags } = req.body;
+
+    post.text = text;
+    post.imageUrl = imageUrl;
+    post.tags = tags;
+    post.updatedAt = Date.now();
+
+    await post.save();
+
+    res.json(post);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Post not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route    PUT api/posts/unlike/:id
+// @desc     Unlike a post
+// @access   Private
+router.put('/unlike/:id', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    // Check if the post has not yet been liked
+    if (post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
+      return res.status(400).json({ msg: 'Post has not yet been liked' });
+    }
+
+    // remove the like
+    const removeIndex = post.likes
+      .map(like => like.user.toString())
+      .indexOf(req.user.id);
+
+    post.likes.splice(removeIndex, 1);
+
+    await post.save();
+
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route    POST api/posts/comment/:id
+// @desc     Add a comment to a post
+// @access   Private
+router.post('/comment/:id', [auth, [
+  check('text', 'Text is required').not().isEmpty()
+]], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    const post = await Post.findById(req.params.id);
+
+    const newComment = {
+      text: req.body.text,
+      name: user.username,
+      avatar: user.avatar,
+      user: req.user.id
+    };
+
+    post.comments.unshift(newComment);
+
+    await post.save();
+
+    res.json(post.comments);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+    res.status(500).send('Server Error');
+  }
+});
+
+export default router;

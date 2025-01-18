@@ -76,14 +76,19 @@ const PostCard = ({ post }) => {
   if (!post) {
     return <div>Loading post...</div>;
   }
-
   return (
     <Card className="mb-3 shadow-sm">
       <Card.Body>
-        {post.user.username && <UserProfileCard user={post.author} />}
-        <Card.Text className="mt-2">{post.content}</Card.Text>
-        {post.image && (
-          <Image src={`http://localhost:5000/${post.image}`} fluid rounded className="mb-2" />
+        <Card.Text className="mt-2">
+          {post.name} 
+          <br/>
+          {post.title}
+        </Card.Text>
+        {post.file_path && post.file_mimetype && post.file_mimetype.startsWith('image/') && (
+          <Image src={`../../backend/${post.file_path}`} fluid rounded className="mb-2" />
+        )}
+        {post.file_path && post.file_mimetype && post.file_mimetype.startsWith('video/') && (
+          <video src={`../../backend/${post.file_path}`} controls className="mb-2" />
         )}
         <div>
           {post.tags && post.tags.map(tag => (

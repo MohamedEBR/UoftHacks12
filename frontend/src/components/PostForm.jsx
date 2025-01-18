@@ -4,17 +4,17 @@ import Dropzone from 'react-dropzone';
 import { AuthContext } from '../context/AuthContext';
 
 const PostForm = () => {
-
   const [state, setState] = useState({
     title: '',
     content: '',
     tags: '',
   });
-  const [file_path, setfile_path] = useState(null);
+  const [file_path, setFile_path] = useState(null);
   const [previewSrc, setPreviewSrc] = useState('');
   const [isPreviewAvailable, setIsPreviewAvailable] = useState(false);
   const dropRef = React.createRef();
   const { token } = useContext(AuthContext);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,12 +34,12 @@ const PostForm = () => {
 
   const onDrop = (files) => {
     const [uploadedFile] = files;
-    setfile_path(uploadedFile);
+    setFile_path(uploadedFile);
 
     const fileReader = new FileReader();
     fileReader.onload = () => {
       setPreviewSrc(fileReader.result);
-      setIsPreviewAvailable(uploadedFile.type.startsWith('image'));
+      setIsPreviewAvailable(uploadedFile.type.startsWith('image') || uploadedFile.type.startsWith('video'));
     };
     fileReader.readAsDataURL(uploadedFile);
   };
@@ -65,14 +65,13 @@ const PostForm = () => {
         formData.append('tags', tags);
 
         if (file_path) {
-          formData.append('file_path', file_path);
+          formData.append('file_path', file_path); // Ensure the field name is 'file'
         }
 
         const response = await fetch('http://localhost:5000/api/posts', {
           method: 'POST',
           headers: {
-            'x-auth-token': `${token}`,
-          },
+'x-auth-token': `${token}`,          },
           body: formData,
         });
 
@@ -125,10 +124,10 @@ const PostForm = () => {
           {({ getRootProps, getInputProps }) => (
             <div {...getRootProps({ className: 'drop-zone' })} ref={dropRef}>
               <input {...getInputProps()} />
-              <p>Drag and drop a file_path OR click here to select a file_path</p>
+              <p>Drag and drop a file OR click here to select a file</p>
               {file_path && (
                 <div>
-                  <strong>Selected file_path:</strong> {file_path.name}
+                  <strong>Selected file:</strong> {file_path.name}
                 </div>
               )}
             </div>
@@ -136,17 +135,22 @@ const PostForm = () => {
         </Dropzone>
         {previewSrc ? (
           isPreviewAvailable ? (
-            <div className="image-preview">
-              <img className="preview-image" src={previewSrc} alt="Preview" />
+            <div className="media-preview">
+              {file_path.type.startsWith('image') && (
+                <img className="preview-image" src={previewSrc} alt="Preview" />
+              )}
+              {file_path.type.startsWith('video') && (
+                <video className="preview-video" src={previewSrc} controls />
+              )}
             </div>
           ) : (
             <div className="preview-message">
-              <p>No preview available for this file_path</p>
+              <p>No preview available for this file</p>
             </div>
           )
         ) : (
           <div className="preview-message">
-            <p>Image preview will be shown here after selection</p>
+            <p>Image/Video preview will be shown here after selection</p>
           </div>
         )}
       </div>

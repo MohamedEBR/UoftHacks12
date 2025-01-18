@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { AuthContext } from './AuthContext';
 
@@ -8,7 +8,7 @@ const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const { token } = useContext(AuthContext);
 
-  const fetchPosts = async (page = 1) => {
+  const fetchPosts = useCallback(async (page = 1) => {
     try {
       const response = await fetch(`http://localhost:5000/api/posts?page=${page}`, {
         headers: {
@@ -26,13 +26,13 @@ const PostProvider = ({ children }) => {
       console.error('Error fetching posts:', error);
       return [];
     }
-  };
+  });
 
   useEffect(() => {
     if (token) {
       fetchPosts().then(data => setPosts(data));
     }
-  }, [token]);
+  }, [fetchPosts, token]);
 
   const addPost = (newPost) => {
     setPosts([newPost, ...posts]);
@@ -48,19 +48,20 @@ const PostProvider = ({ children }) => {
 
   const likePost = async (postId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${postId}/like`, {
-        method: 'POST',
+      const response = await fetch(`http://localhost:5000/api/posts/like/${postId}`, {
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'x-auth-token': token,
         },
       });
-      if (!response.ok) {
+      if (response.ok) {
+        // Increment likesCount directly
+        setPosts(posts.map(post =>
+          post._id === postId ? { ...post, likesCount: (post.likesCount || 0) + 1 } : post
+        ));
+      } else {
         console.error('Failed to like post');
       }
-      // Optimistically update the like count
-      setPosts(posts.map(post =>
-        post._id === postId ? { ...post, likesCount: (post.likesCount || 0) + 1 } : post
-      ));
     } catch (error) {
       console.error('Error liking post:', error);
     }
@@ -68,7 +69,7 @@ const PostProvider = ({ children }) => {
 
   const addComment = async (postId, commentText) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/${postId}/comments`, {
+      const response = await fetch(`http://localhost:5000/api/posts/comment/${postId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,6 +85,8 @@ const PostProvider = ({ children }) => {
       setPosts(posts.map(post =>
         post._id === postId ? { ...post, comments: [...(post.comments || []), newComment] } : post
       ));
+      console.log(posts[0])
+
     } catch (error) {
       console.error('Error adding comment:', error);
     }

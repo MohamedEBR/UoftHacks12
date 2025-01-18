@@ -62,9 +62,10 @@ const PostList = () => {
 
         {posts.map(post => (
           <Col key={post._id}>
-            <PostCard post={post} author={post.user} />
+            <PostCard post={post} />
           </Col>
         ))}
+        {console.log(posts[3])}
       </Row>
     </Container>
   );

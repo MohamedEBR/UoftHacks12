@@ -1,5 +1,5 @@
 pillow.py
 *.jpg
 *.jpeg
-
+env/
 

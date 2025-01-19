@@ -48,10 +48,12 @@ router.post("/", auth, upload.single("file_path"), async (req, res) => {
 
   const dogscriptPath = path.join("../../backend", "../scripts/dogcolorblind.py");
   const catscriptPath = path.join("../../backend", "../scripts/catcolorblind.py");
+  const fishscriptPath = path.join("../../backend", "../scripts/fishvision.py");
 
   const scriptPaths = {
     cat: catscriptPath,
     dog: dogscriptPath,
+    fish: fishscriptPath,
     // Add more pet types and their corresponding scripts here
   };
 

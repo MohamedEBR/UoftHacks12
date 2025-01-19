@@ -184,6 +184,7 @@ const PostForm = () => {
           <option value="">Select pet</option>
           <option value="cat">cat</option>
           <option value="dog">dog</option>
+          <option value="fish">fish</option>
         </Form.Select>
       </Form.Group>
       <Button variant="primary" type="submit" style={{ backgroundColor: 'red', color: 'white' }}>

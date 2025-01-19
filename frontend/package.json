@@ -10,6 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "@react-oauth/google": "^0.12.1",
+    "axios": "^1.7.9",
+=======
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/instrument-sans": "^5.1.1",
+    "@mui/material": "^6.4.0",
+>>>>>>> parent of cd6ff441 (Merge pull request #2 from MohamedEBR/feature-branch2)
+=======
+    "@react-oauth/google": "^0.12.1",
+    "axios": "^1.7.9",
+>>>>>>> parent of 945d9c1d (Merge branch 'main' into feature-branch2)
+>>>>>>> d52f05e52a762dca145d7f21a57653aba1dc7bdd
     "bcrypt": "^5.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

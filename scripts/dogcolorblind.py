@@ -45,7 +45,7 @@ def simulate_dog_vision_video(input_video_path, output_video_path):
     print(f"Saving output to: {output_video_path}")
     clip = VideoFileClip(input_video_path)
     dog_vision_clip = clip.fl_image(dog_vision_array_transform)
-    dog_vision_clip.write_videofile(output_video_path, codec="libx264")
+    dog_vision_clip.write_videofile(output_video_path, codec="libx264", audio_codec="aac")
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

@@ -17,6 +17,13 @@ const UserProfile = () => {
       setLoading(true);
       setError(null);
       try {
+ feature-branch2
+        const response = await fetch('http://localhost:5001/api/users/profile', {
+          headers: {
+            'x-auth-token': `${token}`,
+          },
+        });
+
         const response = await fetch(
           "http://localhost:5000/api/users/profile",
           {
@@ -25,6 +32,7 @@ const UserProfile = () => {
             },
           }
         );
+ main
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

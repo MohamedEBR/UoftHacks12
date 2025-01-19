@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
+import { Card, Image, Button, Badge, Form, ListGroup } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { PostContext } from "../context/PostContext";
 import { AuthContext } from "../context/AuthContext";
-import { Card, CardHeader, IconButton, CardContent, CardActions, CardMedia, Typography, Button, TextField, Box, Badge, List, ListItem, ListItemText } from '@mui/material';
-import { FaHeart, FaComment, FaFileAlt } from 'react-icons/fa'; // Import icons from react-icons
+import UserProfileCard from "./UserProfileCard";
 
 const PostCard = ({ post }) => {
   const { likePost, addComment } = useContext(PostContext);
@@ -99,111 +99,97 @@ const PostCard = ({ post }) => {
     return <div>Loading post...</div>;
   }
   return (
-    <Card sx={{ mb: 3, boxShadow: 3,
-      width: {xs: '100%', sm: '100%', md: '300px', lg: '410px'},
-      height: {xs: '100%', sm: '100%', md: '525px', lg: '610px'},
-    }}>
-       <CardHeader
-        title={post.name}
-        sx={{
-      bgcolor: '#C4D9FF',
-      color: '#564A97'
-
-        }}
-      />
-    <CardContent
-    sx={{
-      mx : 0,
-            p : 0
-    }}>
-      
-     
-      {post.file_path && post.file_mimetype && post.file_mimetype.startsWith("image/") && (
-        <CardMedia
-          component="img"
-          image={`../../backend/${post.file_path}`}
-          alt={post.title}
-          // sx={{ mb: 2, borderRadius: 1 }}
-        />
-      )}
-      {post.file_path && post.file_mimetype && post.file_mimetype.startsWith("video/") && (
-        <CardMedia
-          component="video"
-          src={`../../backend/${post.file_path}`}
-          controls
-          sx={{ mb: 2,
-            width: '100%',
-            height: '450px',
-            borderRadius: 1,
-            
-           }}
-        />
-      )}
-      <Box
-      sx={{
-        pl: 3,
-      }}>
-        {post.tags && post.tags.map((tag) => (
-          <Badge key={tag} badgeContent={tag} color="secondary" sx={{ mr: 1 }} />
-        ))}
-      </Box>
-    </CardContent>
-    <CardActions sx={{ justifyContent: 'space-between' }}>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <Box>
-            <IconButton onClick={() => handleLike(post._id)}>
-              <FaHeart />
-            </IconButton>
-          </Box>
-          <Box>
-            <IconButton onClick={handleCommentClick}>
-              <FaComment />
-            </IconButton>
-          </Box>
-          <Box>
-            <IconButton component={Link} to={`/post/${post._id}`}>
-              <FaFileAlt />
-            </IconButton>
-          </Box>
-        </Box>
-    </CardActions>
-    {/* {commentVisible && (
-      <CardContent>
-        <Box component="form" onSubmit={handleCommentSubmit}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            placeholder="Write a comment..."
-            value={commentText}
-            onChange={handleCommentChange}
-            sx={{ mb: 2 }}
-          />
-          <Box sx={{ textAlign: 'right' }}>
-            <Button variant="contained" type="submit" size="small">
-              Post Comment
-            </Button>
-          </Box>
-        </Box>
-      </CardContent>
-    )}
-    {loadingComments && <CardContent>Loading comments...</CardContent>}
-    {errorComments && <CardContent>Error loading comments: {errorComments}</CardContent>}
-    {comments.length > 0 && (
-      <CardContent>
-        <List>
-          {comments.map((comment) => (
-            <ListItem key={comment._id}>
-              <ListItemText
-                primary={<strong>{comment.author.username}:</strong>}
-                secondary={comment.text}
+    <Card className="mb-3 shadow-sm">
+      <Card.Body>
+        <Card.Text className="mt-2">
+          {post.name}
+          <br />
+          {post.title}
+        </Card.Text>
+        {post.file_path &&
+          post.file_mimetype &&
+          post.file_mimetype.startsWith("image/") && (
+            <Image
+              src={`../../backend/${post.file_path}`}
+              fluid
+              rounded
+              className="mb-2"
+            />
+          )}
+        {post.file_path &&
+          post.file_mimetype &&
+          post.file_mimetype.startsWith("video/") && (
+            <video
+              src={`../../backend/${post.file_path}`}
+              controls
+              className="mb-2"
+            />
+          )}
+        <div>
+          {post.tags &&
+            post.tags.map((tag) => (
+              <Badge key={tag} pill bg="secondary" className="me-1">
+                {tag}
+              </Badge>
+            ))}
+        </div>
+      </Card.Body>
+      <Card.Footer className="text-muted d-flex justify-content-between align-items-center">
+        <div>
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => handleLike(post._id)}
+          >
+            Like
+          </Button>{" "}
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={handleCommentClick}
+          >
+            Comment
+          </Button>
+          <span className="ms-2">{post.likesCount} Likes</span>
+          <span className="ms-2">{post.commentsCount} Comments</span>
+        </div>
+        <Link to={`/post/${post._id}`}>View Details</Link>
+      </Card.Footer>
+      {commentVisible && (
+        <Card.Footer>
+          <Form onSubmit={handleCommentSubmit}>
+            <Form.Group className="mb-0">
+              <Form.Control
+                type="text"
+                placeholder="Write a comment..."
+                value={commentText}
+                onChange={handleCommentChange}
               />
-            </ListItem>
-          ))}
-        </List>
-      </CardContent>
-    )} */}
-  </Card>
+            </Form.Group>
+            <div className="text-end mt-2">
+              <Button variant="primary" type="submit" size="sm">
+                Post Comment
+              </Button>
+            </div>
+          </Form>
+        </Card.Footer>
+      )}
+      {loadingComments && <Card.Footer>Loading comments...</Card.Footer>}
+      {errorComments && (
+        <Card.Footer>Error loading comments: {errorComments}</Card.Footer>
+      )}
+      {comments.length > 0 && (
+        <Card.Footer>
+          <ListGroup variant="flush">
+            {comments.map((comment) => (
+              <ListGroup.Item key={comment._id}>
+                <strong>{comment.author.username}:</strong> {comment.text}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        </Card.Footer>
+      )}
+    </Card>
   );
 };
 

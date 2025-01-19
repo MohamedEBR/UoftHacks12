@@ -21,10 +21,6 @@
     "express-validator": "^7.2.1",
 <<<<<<< HEAD
  feature-branch2
- feature-branch2
-
- feature-branch
- main
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",

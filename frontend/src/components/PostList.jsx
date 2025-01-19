@@ -1,14 +1,15 @@
-import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { Container, Spinner } from 'react-bootstrap';
-import PostCard from './PostCard';
-import { Box, Grid2 } from '@mui/material';
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { Container, Spinner, Row, Col } from "react-bootstrap";
+import PostCard from "./PostCard";
+import { useNavigate } from "react-router-dom";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   console.log("token kaboom", token);
   useEffect(() => {
     const fetchPosts = async () => {
@@ -57,26 +58,19 @@ const PostList = () => {
       </Container>
     );
   }
-
+  console.log("les, ", posts);
   return (
-    <Box
-    sx={{
-      p : 5,
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      <Grid2 container spacing={4} sx={{
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      {posts.map((post) => (
-        <Grid2 item xs={12} sm={6} md={4} lg={4} key={post._id}>
-          <PostCard post={post} />
-        </Grid2>
-      ))}
-      {console.log(posts[3])}
-    </Grid2>
-      </Box>
+    <Container className="mt-5">
+      <h2>Feed</h2>
+      <Row xs={1} md={2} lg={3} className="g-4">
+        {posts.map((post) => (
+          <Col key={post._id}>
+            <PostCard post={post} />
+          </Col>
+        ))}
+        {console.log(posts[3])}
+      </Row>
+    </Container>
   );
 };
 

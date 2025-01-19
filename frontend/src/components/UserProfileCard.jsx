@@ -7,7 +7,7 @@ const UserProfileCard = ({ user }) => {
       <Card.Body className="d-flex align-items-center">
         {user && user.avatar && (
           <img
-            src={`http://localhost:5000/${user.avatar}`}
+            src={`http://localhost:5001/${user.avatar}`}
             alt="User Avatar"
             className="rounded-circle me-2"
             width="30"

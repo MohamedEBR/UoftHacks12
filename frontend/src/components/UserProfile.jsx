@@ -17,7 +17,7 @@ const UserProfile = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:5000/api/users/profile', {
+        const response = await fetch('http://localhost:5001/api/users/profile', {
           headers: {
             'x-auth-token': `${token}`,
           },

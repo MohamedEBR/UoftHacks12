@@ -68,7 +68,7 @@ const PostForm = () => {
           formData.append('file_path', file_path); // Ensure the field name is 'file'
         }
 
-        const response = await fetch('http://localhost:5000/api/posts', {
+        const response = await fetch('http://localhost:5001/api/posts', {
           method: 'POST',
           headers: {
 'x-auth-token': `${token}`,          },

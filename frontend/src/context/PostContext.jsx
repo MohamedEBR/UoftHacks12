@@ -10,7 +10,7 @@ const PostProvider = ({ children }) => {
 
   const fetchPosts = useCallback(async (page = 1) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts?page=${page}`, {
+      const response = await fetch(`http://localhost:5001/api/posts?page=${page}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -48,10 +48,10 @@ const PostProvider = ({ children }) => {
 
   const likePost = async (postId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/like/${postId}`, {
+      const response = await fetch(`http://localhost:5001/api/posts/like/${postId}`, {
         method: 'PUT',
         headers: {
-          'x-auth-token': token,
+          'Authorization': `Bearer ${token}`,
         },
       });
       if (response.ok) {
@@ -69,7 +69,7 @@ const PostProvider = ({ children }) => {
 
   const addComment = async (postId, commentText) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/posts/comment/${postId}`, {
+      const response = await fetch(`http://localhost:5001/api/posts/comment/${postId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

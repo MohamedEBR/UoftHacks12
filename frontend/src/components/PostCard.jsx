@@ -20,7 +20,7 @@ const PostCard = ({ post }) => {
       setLoadingComments(true);
       setErrorComments(null);
       try {
-        const response = await fetch(`http://localhost:5000/api/posts/${post._id}/comments`, {
+        const response = await fetch(`http://localhost:5001/api/posts/${post._id}/comments`, {
           headers: {
             Authorization: `Bearer ${user?.token}`,
           },
@@ -64,7 +64,7 @@ const PostCard = ({ post }) => {
     await addComment(post._id, commentText);
     setCommentText('');
     // Refresh comments after submission
-    const response = await fetch(`http://localhost:5000/api/posts/${post._id}/comments`, {
+    const response = await fetch(`http://localhost:5001/api/posts/${post._id}/comments`, {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },

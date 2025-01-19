@@ -18,6 +18,10 @@ file_mimetype: {
     type: String,
     required: false
   },
+pet: {
+  type: String,
+  required: true
+},
   likes: [{
     user: {
       type: Schema.Types.ObjectId,

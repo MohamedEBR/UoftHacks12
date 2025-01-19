@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { Container, Spinner, Row, Col } from 'react-bootstrap';
-import PostCard from './PostCard';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { Container, Spinner, Row, Col } from "react-bootstrap";
+import PostCard from "./PostCard";
+import { useNavigate } from "react-router-dom";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -10,15 +10,15 @@ const PostList = () => {
   const [error, setError] = useState(null);
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  console.log("token kaboom", token);
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://localhost:5000/api/posts', {
+        const response = await fetch("http://localhost:5000/api/posts", {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (!response.ok) {
@@ -35,7 +35,7 @@ const PostList = () => {
     };
 
     fetchPosts();
-  }, [token, navigate]);
+  }, []);
 
   if (loading) {
     return (
@@ -54,13 +54,12 @@ const PostList = () => {
       </Container>
     );
   }
-  console.log(posts)
+  console.log("les, ", posts);
   return (
     <Container className="mt-5">
       <h2>Feed</h2>
       <Row xs={1} md={2} lg={3} className="g-4">
-
-        {posts.map(post => (
+        {posts.map((post) => (
           <Col key={post._id}>
             <PostCard post={post} />
           </Col>

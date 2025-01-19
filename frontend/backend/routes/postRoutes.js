@@ -1,10 +1,14 @@
 import express from 'express';
-const router = express.Router();
-import { check, validationResult } from 'express-validator';
+import path from 'path';
+import { spawn } from 'child_process';
 import auth from '../middleware/auth.js';
-import Post from '../models/Post.js';
-import User from '../models/User.js';
 import multer from 'multer';
+import User from '../models/User.js';
+import Post from '../models/Post.js';
+import { check, validationResult } from 'express-validator';
+
+
+const router = express.Router();
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -37,31 +41,57 @@ router.post('/', auth, upload.single('file_path'), async (req, res) => {
   const { title, content, tags } = req.body;
   const file_path = req.file;
 
-  if (!req.user) {
-    return res.status(401).json({ msg: 'Unauthorized' });
-  }
+  const scriptPath = path.join("../../backend", '../scripts/dogcolorblind.py');
 
-  try {
-    const user = await User.findById(req.user.id).select('-password');
+  const updateFilePath = req.file.path;
 
-    const newPost = new Post({
-      title,
-      content,
-      tags,
-      file_path: file_path ? file_path.path : null,
-      user: req.user.id,
-      name: user.username,
-      avatar: user.avatar,
-      file_mimetype: file_path ? file_path.mimetype : null,
-    });
+  console.log(updateFilePath)
 
-    const post = await newPost.save();
-    console.log('Post created:', post);
-    res.json(post);
-  } catch (err) {
-    console.error('Error creating post:', err.message);
-    res.status(500).send('Server Error');
-  }
+  const pythonProcess = spawn('python', [scriptPath, updateFilePath, updateFilePath]);
+
+  pythonProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  pythonProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  pythonProcess.on('close', async (code) => {
+    console.log(`child process exited with code ${code}`);
+    if (code !== 0) {
+      return res.status(500).send('Script execution failed');
+    }
+
+    console.log(updateFilePath)
+  
+
+    if (!req.user) {
+      return res.status(401).json({ msg: 'Unauthorized' });
+    }
+
+    try {
+      const user = await User.findById(req.user.id).select('-password');
+
+      const newPost = new Post({
+        title,
+        content,
+        tags,
+        file_path: outputFilePath,
+        user: req.user.id,
+        name: user.username,
+        avatar: user.avatar,
+        file_mimetype: file_path ? file_path.mimetype : null,
+      });
+
+      const post = await newPost.save();
+      console.log('Post created:', post);
+      res.json(post);
+    } catch (err) {
+      console.error('Error creating post:', err.message);
+      res.status(500).send('Server Error');
+    }
+  });
 });
 
 // @route   GET api/posts

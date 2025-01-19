@@ -1,13 +1,8 @@
 numpy
 matplotlib
 opencv-python
-transformers
 pillow
 requests
-datasets
-torch
-torchvision
-timm
 flask
 moviepy
 scipy

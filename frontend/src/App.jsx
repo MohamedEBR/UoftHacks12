@@ -10,7 +10,9 @@ import UserProfile from './components/UserProfile';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthContext } from './context/AuthContext';
 import { PostProvider } from './context/PostContext';
-import { Container } from 'react-bootstrap';
+import { Box } from '@mui/material';
+import '@fontsource/instrument-sans'; // Defaults to 400 weight
+
 
 function App() {
   const { isLoggedIn } = useContext(AuthContext);
@@ -18,7 +20,10 @@ function App() {
   return (
     <Router>
       <Header className="bg-light" />
-      <Container>
+      <Box
+      sx={{
+        bgcolor: '#E8F9FF',
+      }}>
         <PostProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -30,7 +35,7 @@ function App() {
             <Route path="/create-post" element={<PrivateRoute><PostForm /></PrivateRoute>} />
           </Routes>
         </PostProvider>
-      </Container>
+      </Box>
     </Router>
   );
 }

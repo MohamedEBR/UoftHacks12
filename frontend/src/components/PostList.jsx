@@ -16,11 +16,7 @@ const PostList = () => {
       setLoading(true);
       setError(null);
       try {
- feature-branch2
-        const response = await fetch('http://localhost:5001/api/posts', {
-
         const response = await fetch("http://localhost:5000/api/posts", {
- main
           headers: {
             Authorization: `Bearer ${token}`,
           },

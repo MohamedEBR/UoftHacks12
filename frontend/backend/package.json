@@ -20,7 +20,11 @@
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
 <<<<<<< HEAD
+<<<<<<< HEAD
  feature-branch2
+=======
+ feature-branch
+>>>>>>> parent of cd6ff441 (Merge pull request #2 from MohamedEBR/feature-branch2)
     "google-auth-library": "^9.15.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",

@@ -16,13 +16,6 @@ const PostProvider = ({ children }) => {
 
   const fetchPosts = useCallback(async (page = 1) => {
     try {
- feature-branch2
-      const response = await fetch(`http://localhost:5001/api/posts?page=${page}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
       const response = await fetch(
         `http://localhost:5000/api/posts?page=${page}`,
         {
@@ -31,7 +24,6 @@ const PostProvider = ({ children }) => {
           },
         }
       );
- main
       if (response.ok) {
         const data = await response.json();
         return data;
@@ -67,14 +59,6 @@ const PostProvider = ({ children }) => {
 
   const likePost = async (postId) => {
     try {
- feature-branch2
-      const response = await fetch(`http://localhost:5001/api/posts/like/${postId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
       const response = await fetch(
         `http://localhost:5000/api/posts/like/${postId}`,
         {
@@ -84,7 +68,6 @@ const PostProvider = ({ children }) => {
           },
         }
       );
- main
       if (response.ok) {
         // Increment likesCount directly
         setPosts(
@@ -104,16 +87,6 @@ const PostProvider = ({ children }) => {
 
   const addComment = async (postId, commentText) => {
     try {
- feature-branch2
-      const response = await fetch(`http://localhost:5001/api/posts/comment/${postId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ text: commentText }),
-      });
-
       const response = await fetch(
         `http://localhost:5000/api/posts/comment/${postId}`,
         {
@@ -125,7 +98,6 @@ const PostProvider = ({ children }) => {
           body: JSON.stringify({ text: commentText }),
         }
       );
- main
       if (!response.ok) {
         console.error("Failed to add comment");
       }

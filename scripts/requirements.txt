@@ -1,0 +1,5 @@
+numpy
+Pillow
+moviepy
+scipy
+flask

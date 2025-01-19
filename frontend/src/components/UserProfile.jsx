@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { Container, Card, Spinner, Row, Col } from 'react-bootstrap';
-import PostCard from './PostCard';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { Container, Card, Spinner, Row, Col } from "react-bootstrap";
+import PostCard from "./PostCard";
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -17,11 +17,22 @@ const UserProfile = () => {
       setLoading(true);
       setError(null);
       try {
+ feature-branch2
         const response = await fetch('http://localhost:5001/api/users/profile', {
           headers: {
             'x-auth-token': `${token}`,
           },
         });
+
+        const response = await fetch(
+          "http://localhost:5000/api/users/profile",
+          {
+            headers: {
+              "x-auth-token": `${token}`,
+            },
+          }
+        );
+ main
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -37,7 +48,7 @@ const UserProfile = () => {
     };
 
     fetchUserProfile();
-  }, [token, navigate]);
+  }, []);
 
   if (loading) {
     return (
@@ -58,22 +69,27 @@ const UserProfile = () => {
   }
 
   if (!user) {
-    return <Container className="text-center mt-5">Profile not found</Container>;
+    return (
+      <Container className="text-center mt-5">Profile not found</Container>
+    );
   }
+  console.log("sfdffes, ", posts);
 
   return (
     <Container className="mt-5">
       <Card className="mb-4">
         <Card.Body>
           <Card.Title>{user.username}</Card.Title>
-          <Card.Subtitle className="mb-2 text-muted">{user.email}</Card.Subtitle>
+          <Card.Subtitle className="mb-2 text-muted">
+            {user.email}
+          </Card.Subtitle>
           {user.bio && <Card.Text>{user.bio}</Card.Text>}
         </Card.Body>
       </Card>
 
       <h3>Your Posts</h3>
       <Row xs={1} md={2} lg={3} className="g-4">
-        {posts.map(post => (
+        {posts.map((post) => (
           <Col key={post._id}>
             <PostCard post={post} />
           </Col>

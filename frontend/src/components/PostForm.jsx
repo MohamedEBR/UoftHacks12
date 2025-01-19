@@ -8,6 +8,7 @@ const PostForm = () => {
     title: '',
     content: '',
     tags: '',
+    pet: ''
   });
   const [file_path, setFile_path] = useState(null);
   const [previewSrc, setPreviewSrc] = useState('');
@@ -32,6 +33,13 @@ const PostForm = () => {
     }));
   };
 
+  const handleSelectChange = (event) => {
+    const { value } = event.target;
+    setState((prevState) => ({
+      ...prevState,
+      pet: value,
+    }));
+  };
   const onDrop = (files) => {
     const [uploadedFile] = files;
     setFile_path(uploadedFile);
@@ -56,13 +64,14 @@ const PostForm = () => {
     e.preventDefault();
 
     try {
-      const { title, content, tags } = state;
+      const { title, content, tags, pet } = state;
 
-      if (title && content && tags && title.trim() !== '' && content.trim() !== '' && tags.trim() !== '') {
+      if (title && content && tags && pet && title.trim() !== '' && content.trim() !== '' && tags.trim() !== '' && pet.trim() !== '') {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('content', content);
         formData.append('tags', tags);
+        formData.append('pet', pet);
 
         if (file_path) {
           formData.append('file_path', file_path); // Ensure the field name is 'file'
@@ -165,7 +174,18 @@ const PostForm = () => {
           onChange={handleTagsChange}
         />
       </Form.Group>
-
+      <Form.Group className="mb-3" controlId="tags">
+        <Form.Label>Pet perspective</Form.Label>
+        <Form.Select
+          name="pet"
+          onChange={handleSelectChange}
+          required
+        >
+          <option value="">Select pet</option>
+          <option value="cat">cat</option>
+          <option value="dog">dog</option>
+        </Form.Select>
+      </Form.Group>
       <Button variant="primary" type="submit" style={{ backgroundColor: 'red', color: 'white' }}>
         Post
       </Button>

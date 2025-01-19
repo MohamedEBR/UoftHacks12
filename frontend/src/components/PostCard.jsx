@@ -20,6 +20,13 @@ const PostCard = ({ post }) => {
       setLoadingComments(true);
       setErrorComments(null);
       try {
+ feature-branch2
+        const response = await fetch(`http://localhost:5001/api/posts/${post._id}/comments`, {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+
         const response = await fetch(
           `http://localhost:5000/api/posts/${post._id}/comments`,
           {
@@ -28,6 +35,7 @@ const PostCard = ({ post }) => {
             },
           }
         );
+ main
         if (!response.ok) {
           throw new Error(`Failed to fetch comments: ${response.status}`);
         }
@@ -67,6 +75,13 @@ const PostCard = ({ post }) => {
     await addComment(post._id, commentText);
     setCommentText("");
     // Refresh comments after submission
+ feature-branch2
+    const response = await fetch(`http://localhost:5001/api/posts/${post._id}/comments`, {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+
     const response = await fetch(
       `http://localhost:5000/api/posts/${post._id}/comments`,
       {
@@ -75,6 +90,7 @@ const PostCard = ({ post }) => {
         },
       }
     );
+ main
     const data = await response.json();
     setComments(data);
   };
